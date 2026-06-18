@@ -1,7 +1,6 @@
 import axios, { AxiosError } from 'axios'
 
-import { useAuthStore } from '@/store/auth-store'
-import type { ApiError } from '@/types'
+import type { ApiError } from '../types/apiError'
 
 /**
  * Mərkəzi axios instance-ı. baseURL `.env`-dəki `VITE_API_URL`-dan gəlir.
@@ -15,7 +14,7 @@ export const apiClient = axios.create({
 })
 
 apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token
+  const token = localStorage.getItem('accessToken')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -25,9 +24,11 @@ apiClient.interceptors.request.use((config) => {
 // Səhvləri normallaşdır: backend mesajını çıxar, 401-də logout et.
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ message?: string }>) => {
+  (error: AxiosError<{ message?: string; errors?: any }>) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout()
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      window.location.replace('/login')
     }
 
     const normalized: ApiError = {
@@ -35,7 +36,8 @@ apiClient.interceptors.response.use(
         error.response?.data?.message ??
         error.message ??
         'Gözlənilməz xəta baş verdi',
-      statusCode: error.response?.status ?? 0,
+      status: error.response?.status ?? 0,
+      errors: error.response?.data?.errors ?? null,
     }
     return Promise.reject(normalized)
   },
