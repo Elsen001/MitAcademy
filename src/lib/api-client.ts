@@ -12,9 +12,7 @@ const apiClient = axios.create({
   },
 });
 
-/*
- * REQUEST INTERCEPTOR
- */
+
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("accessToken");
@@ -28,18 +26,14 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/**
- * RESPONSE INTERCEPTOR
- */
+
 apiClient.interceptors.response.use(
   (response) => response,
 
   (error: AxiosError<any>) => {
     const status = error.response?.status;
 
-    // =========================
-    // 401 → logout + redirect
-    // =========================
+   
     if (status === 401) {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
@@ -48,9 +42,7 @@ apiClient.interceptors.response.use(
       window.location.replace("/login");
     }
 
-    // =========================
-    // normalize error
-    // =========================
+    
     const normalizedError: ApiError = {
       status: status ?? 500,
       message:
@@ -60,7 +52,6 @@ apiClient.interceptors.response.use(
       errors: error.response?.data?.errors ?? null,
     };
 
-    // global toast (optional)
     if (status !== 401) {
       showError(normalizedError.message);
     }
