@@ -43,12 +43,15 @@ apiClient.interceptors.response.use(
     }
 
     
+    const responseMessage = error.response?.data?.message;
     const normalizedError: ApiError = {
       status: status ?? 500,
       message:
-        error.response?.data?.message ||
-        error.message ||
-        "Something went wrong",
+        typeof responseMessage === "string"
+          ? responseMessage
+          : responseMessage
+          ? JSON.stringify(responseMessage)
+          : error.message || "Something went wrong",
       errors: error.response?.data?.errors ?? null,
     };
 
