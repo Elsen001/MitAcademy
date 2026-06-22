@@ -42,6 +42,18 @@ export default function Layout() {
           >
             Müayinə əlavə et
           </NavLink>
+          <NavLink
+            to="/tasks"
+            className={({ isActive }) =>
+              `rounded-full px-4 py-2 text-sm font-medium transition ${
+                isActive
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              }`
+            }
+          >
+            Vəzifələr
+          </NavLink>
         </nav>
       </header>
 

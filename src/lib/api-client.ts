@@ -3,8 +3,10 @@ import type { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { ApiError } from "../types/apiError";
 import { showError } from "./toast";
 
+const baseURL = (import.meta.env.VITE_API_URL ?? "https://api-demo.medbooking.az/api/").replace(/\/+$/g, "");
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
